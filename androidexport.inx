@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension>
+    <_name>Android Export</_name>
+    <id>headsortailsgame.inkscape.androidexport</id>
+    <dependency type="executable" location="extensions">androidexport.py</dependency>
+    <param name="path" type="string" _gui-text="Export path" _gui-description=""></param>
+    <effect needs-live-preview="false">
+        <object-type>all</object-type>
+        <effects-menu>
+            <submenu _name="Export" />
+        </effects-menu>
+    </effect>
+    <script>
+        <command reldir="extensions" interpreter="python">androidexport.py</command>
+    </script>
+</inkscape-extension>
