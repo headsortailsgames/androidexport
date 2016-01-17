@@ -12,12 +12,28 @@ class AndroidExport(inkex.Effect):
 
         # store the path to export the image
         self.OptionParser.add_option("--path", action="store",
-                                     type="string", dest="path",
-                                     default="", help="")
+                                     type="string", dest="path")
+
+        self.OptionParser.add_option("--ldpi", action="store",
+                                     type="string", dest="ldpi")
+        self.OptionParser.add_option("--mdpi", action="store",
+                                     type="string", dest="mdpi")
+        self.OptionParser.add_option("--hdpi", action="store",
+                                     type="string", dest="hdpi")
+        self.OptionParser.add_option("--xhdpi", action="store",
+                                     type="string", dest="xhdpi")
+        self.OptionParser.add_option("--xxhdpi", action="store",
+                                     type="string", dest="xxhdpi")
+        self.OptionParser.add_option("--xxxhdpi", action="store",
+                                     type="string", dest="xxxhdpi")
+
 
         self.resolution_multipliers = {"ldpi": 0.5, "mdpi": 1,
                                        "hdpi": 1.5, "xhdpi": 2,
-                                       "xxhdpi": 3}
+                                       "xxhdpi": 3, "xxxhdpi": 4}
+        self.should_export          = {"ldpi": False, "mdpi": False,
+                                       "hdpi": False, "xhdpi": False,
+                                       "xxhdpi": False, "xxxhdpi": False}
 
     def effect(self):
 
@@ -25,18 +41,32 @@ class AndroidExport(inkex.Effect):
             inkex.errormsg('Empty file path!')
             exit()
 
-        # Solves the paths that use "~" as the home directory
-        filepath = os.path.expanduser(self.options.path)
+        for resolution in self.should_export:
+            flag = getattr(self.options, resolution)
+            if flag.lower() == "true":
+                self.should_export[resolution] = True
+            else:
+                self.should_export[resolution] = False
 
-        # Checks if the directory exists
-        if not os.path.exists(os.path.dirname(filepath)):
-            msg = 'The directory "{}" does not exist.'
-            msg = msg.format(os.path.dirname(filepath))
-            inkex.errormsg(msg)
+        # Checks if a path has the correct format
+        if "{}" not in self.options.path:
+            inkex.errormsg('The path entered does not have a {} inside it. '
+                           'Enter a path that has a {} in the place of the '
+                           'resolution name. In example, if you put the path '
+                           '"folder/example/{}/my_image.png", this extension '
+                           'will export images for several paths: '
+                           '"folder/example/mdpi/my_image.png", '
+                           '"folder/example/xxhdpi/my_image.png"')
             exit()
 
+        # Solves the paths that use "~" as the home directory
+        filepath = os.path.expanduser(self.options.path)
+        filepath = filepath.replace('{}', '{0}')
+
+
         area = self.get_selected_area()
-        resolutions = self.resolution_multipliers.keys()
+        resolutions = filter(lambda res: self.should_export[res],
+                             self.resolution_multipliers.keys())
 
         self.export_to_resolutions(filepath, area, resolutions)
 
@@ -100,7 +130,7 @@ class AndroidExport(inkex.Effect):
     def export_to_resolutions(self, filepath, area, resolutions):
         """
         For each resolution selected exports the objects that are inside the
-        area with the filname of {filepath}_{resolution}.png
+        area.
         """
 
         # Make the image sizes disible by 2
@@ -118,8 +148,7 @@ class AndroidExport(inkex.Effect):
         x0, y0 = area[0]
         x1, y1 = area[1]
 
-        # For each resolution checked export the image with the name
-        # chosen ({name}_{resolution}.png)
+        # For each resolution checked export the image
         for resolution in resolutions:
             multiplier = self.resolution_multipliers[resolution]
 
@@ -133,12 +162,19 @@ class AndroidExport(inkex.Effect):
             if export_h % 2:
                 export_h += 1
 
-            filename, extension = os.path.splitext(filepath)
+            path = filepath.format(resolution)
+
+            # Checks if the directory exists
+            if not os.path.exists(os.path.dirname(path)):
+                msg = 'The directory "{}" does not exist.'
+                msg = msg.format(os.path.dirname(path))
+                inkex.errormsg(msg)
+                exit()
+
 
             # Formating the export command
             cmd = pattern.format(x0, y0, x1, y1, export_w, export_h,
-                                 filename + "_" + resolution + extension,
-                                 self.svg_file)
+                                 path, self.svg_file)
 
             # Executing the export command
             process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE,

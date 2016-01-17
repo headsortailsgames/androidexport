@@ -3,7 +3,18 @@
     <_name>Android Export</_name>
     <id>headsortailsgame.inkscape.androidexport</id>
     <dependency type="executable" location="extensions">androidexport.py</dependency>
+
+    <_param name="title" type="description">Enter a path below that has a {} in the place of the resolution name. In example, if you put the path "folder/example/{}/my_image.png", this extension will export images for several paths: "folder/example/mdpi/my_image.png", "folder/example/xxhdpi/my_image.png"</_param>
+
     <param name="path" type="string" _gui-text="Export path" _gui-description=""></param>
+
+    <param name="ldpi"    type="boolean" _gui-text="LDPI version">false</param>
+    <param name="mdpi"    type="boolean" _gui-text="MDPI version">true</param>
+    <param name="hdpi"    type="boolean" _gui-text="HDPI version">true</param>
+    <param name="xhdpi"   type="boolean" _gui-text="XHDPI version">true</param>
+    <param name="xxhdpi"  type="boolean" _gui-text="XXHDPI version">true</param>
+    <param name="xxxhdpi" type="boolean" _gui-text="XXXHDPI version">true</param>
+
     <effect needs-live-preview="false">
         <object-type>all</object-type>
         <effects-menu>
