@@ -1,12 +1,9 @@
 #! /usr/bin/env python
-
-import sys
 import os.path
 import subprocess
 
 import inkex
 
-inkex.localize()
 
 class AndroidExport(inkex.Effect):
 
@@ -25,7 +22,7 @@ class AndroidExport(inkex.Effect):
     def effect(self):
 
         if not self.options.path:
-            inkex.errormsg(_('Empty file path!'))
+            inkex.errormsg('Empty file path!')
             exit()
 
         # Solves the paths that use "~" as the home directory
@@ -35,7 +32,7 @@ class AndroidExport(inkex.Effect):
         if not os.path.exists(os.path.dirname(filepath)):
             msg = 'The directory "{}" does not exist.'
             msg = msg.format(os.path.dirname(filepath))
-            inkex.errormsg(_(msg))
+            inkex.errormsg(msg)
             exit()
 
         area = self.get_selected_area()
@@ -51,7 +48,7 @@ class AndroidExport(inkex.Effect):
 
         # If there ins't any object selected raises an error
         if len(self.selected) == 0:
-            inkex.errormsg(_('Select an object to export.'))
+            inkex.errormsg('Select an object to export.')
             exit()
 
         # Command line to revocer all information inside the SVG file
@@ -107,10 +104,12 @@ class AndroidExport(inkex.Effect):
         """
 
         # Make the image sizes disible by 2
-        if (area[1][0] - area[0][0]) % 2: area[1][0] += 1
+        if (area[1][0] - area[0][0]) % 2:
+            area[1][0] += 1
         w = area[1][0] - area[0][0]
 
-        if (area[1][1] - area[0][1]) % 2: area[1][1] += 1
+        if (area[1][1] - area[0][1]) % 2:
+            area[1][1] += 1
         h = area[1][1] - area[0][1]
 
         # Command Pattern to export an SVG
@@ -126,11 +125,13 @@ class AndroidExport(inkex.Effect):
 
             export_w = w*multiplier
             # Granting divisibility by 2 on the final image
-            if export_w % 2: export_w += 1
+            if export_w % 2:
+                export_w += 1
 
             export_h = h*multiplier
             # Granting divisibility by 2 on the final image
-            if export_h % 2: export_h += 1
+            if export_h % 2:
+                export_h += 1
 
             filename, extension = os.path.splitext(filepath)
 
@@ -145,6 +146,6 @@ class AndroidExport(inkex.Effect):
             process.wait()
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     ext = AndroidExport()
     ext.affect()
